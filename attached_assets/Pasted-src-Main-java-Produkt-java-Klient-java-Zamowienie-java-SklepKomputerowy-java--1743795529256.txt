@@ -1,0 +1,237 @@
+src/
+├── Main.java
+├── Produkt.java
+├── Klient.java
+├── Zamowienie.java
+└── SklepKomputerowy.java
+
+// Produkt.java
+public class Produkt {
+    private int id;
+    private String nazwa;
+    private String kategoria;
+    private double cena;
+    private int iloscWMagazynie;
+
+    public Produkt() {}
+
+    public Produkt(int id, String nazwa, String kategoria, double cena, int iloscWMagazynie) {
+        this.id = id;
+        this.nazwa = nazwa;
+        this.kategoria = kategoria;
+        this.cena = cena;
+        this.iloscWMagazynie = iloscWMagazynie;
+    }
+
+    public int getId() { return id; }
+    public String getNazwa() { return nazwa; }
+    public String getKategoria() { return kategoria; }
+    public double getCena() { return cena; }
+    public int getIloscWMagazynie() { return iloscWMagazynie; }
+
+    public void setId(int id) { this.id = id; }
+    public void setNazwa(String nazwa) { this.nazwa = nazwa; }
+    public void setKategoria(String kategoria) { this.kategoria = kategoria; }
+    public void setCena(double cena) { this.cena = cena; }
+    public void setIloscWMagazynie(int ilosc) { this.iloscWMagazynie = ilosc; }
+
+    public void wyswietlInformacje() {
+        System.out.println("ID: " + id + ", Nazwa: " + nazwa + ", Kategoria: " + kategoria + ", Cena: " + cena + ", Ilość: " + iloscWMagazynie);
+    }
+}
+
+// Klient.java
+public class Klient {
+    private int id;
+    private String imie;
+    private String nazwisko;
+    private String email;
+    private boolean czyStaly;
+
+    public Klient() {}
+
+    public Klient(int id, String imie, String nazwisko, String email, boolean czyStaly) {
+        this.id = id;
+        this.imie = imie;
+        this.nazwisko = nazwisko;
+        this.email = email;
+        this.czyStaly = czyStaly;
+    }
+
+    public int getId() { return id; }
+    public String getImie() { return imie; }
+    public String getNazwisko() { return nazwisko; }
+    public String getEmail() { return email; }
+    public boolean isCzyStaly() { return czyStaly; }
+
+    public void setId(int id) { this.id = id; }
+    public void setImie(String imie) { this.imie = imie; }
+    public void setNazwisko(String nazwisko) { this.nazwisko = nazwisko; }
+    public void setEmail(String email) { this.email = email; }
+    public void setCzyStaly(boolean czyStaly) { this.czyStaly = czyStaly; }
+
+    public void wyswietlInformacje() {
+        System.out.println("ID: " + id + ", Imię: " + imie + ", Nazwisko: " + nazwisko + ", Email: " + email + ", Stały klient: " + czyStaly);
+    }
+}
+
+// Zamowienie.java
+public class Zamowienie {
+    private int id;
+    public Klient klient;
+    public Produkt[] produkty;
+    public int[] ilosci;
+    private double[] cenyPoZnizce;
+    private String dataZamowienia;
+    private String status;
+
+    public Zamowienie(int id, Klient klient, Produkt[] produkty, int[] ilosci, String dataZamowienia) {
+        this.id = id;
+        this.klient = klient;
+        this.produkty = produkty;
+        this.ilosci = ilosci;
+        this.dataZamowienia = dataZamowienia;
+        this.status = "Nowe";
+
+        this.cenyPoZnizce = new double[produkty.length];
+        for (int i = 0; i < produkty.length; i++) {
+            if (klient.isCzyStaly()) {
+                cenyPoZnizce[i] = produkty[i].getCena() * 0.9;
+            } else {
+                cenyPoZnizce[i] = produkty[i].getCena();
+            }
+        }
+    }
+
+    public int getId() { return id; }
+    public void setStatus(String status) { this.status = status; }
+
+    public double obliczWartoscZamowienia() {
+        double suma = 0;
+        for (int i = 0; i < produkty.length; i++) {
+            suma += cenyPoZnizce[i] * ilosci[i];
+        }
+        return suma;
+    }
+
+    public void wyswietlSzczegoly() {
+        System.out.println("Zamówienie ID: " + id + ", Klient: " + klient.getImie() + " " + klient.getNazwisko());
+        System.out.println("Data: " + dataZamowienia + ", Status: " + status);
+        for (int i = 0; i < produkty.length; i++) {
+            System.out.println(" - " + produkty[i].getNazwa() + " x " + ilosci[i] + " = " + cenyPoZnizce[i] * ilosci[i]);
+        }
+        System.out.println("Łącznie: " + obliczWartoscZamowienia());
+    }
+}
+
+// SklepKomputerowy.java
+public class SklepKomputerowy {
+    private Produkt[] produkty = new Produkt[100];
+    private Klient[] klienci = new Klient[100];
+    private Zamowienie[] zamowienia = new Zamowienie[100];
+    private int liczbaProduktow = 0;
+    private int liczbaKlientow = 0;
+    private int liczbaZamowien = 0;
+
+    public void dodajProdukt(Produkt produkt) {
+        produkty[liczbaProduktow++] = produkt;
+    }
+
+    public void dodajKlienta(Klient klient) {
+        klienci[liczbaKlientow++] = klient;
+    }
+
+    public Zamowienie utworzZamowienie(Klient klient, Produkt[] produktyZam, int[] ilosci) {
+        Zamowienie zamowienie = new Zamowienie(++liczbaZamowien, klient, produktyZam, ilosci, "2025-04-04");
+        zamowienia[liczbaZamowien - 1] = zamowienie;
+        return zamowienie;
+    }
+
+    public void aktualizujStanMagazynowy(Zamowienie zamowienie) {
+        Produkt[] prod = zamowienie.produkty;
+        int[] ilosci = zamowienie.ilosci;
+        for (int i = 0; i < prod.length; i++) {
+            prod[i].setIloscWMagazynie(prod[i].getIloscWMagazynie() - ilosci[i]);
+        }
+    }
+
+    public void zmienStatusZamowienia(int idZamowienia, String nowyStatus) {
+        for (int i = 0; i < liczbaZamowien; i++) {
+            if (zamowienia[i].getId() == idZamowienia) {
+                zamowienia[i].setStatus(nowyStatus);
+            }
+        }
+    }
+
+    public void wyswietlProduktyWKategorii(String kategoria) {
+        System.out.println("Produkty w kategorii: " + kategoria);
+        for (int i = 0; i < liczbaProduktow; i++) {
+            if (produkty[i].getKategoria().equalsIgnoreCase(kategoria)) {
+                produkty[i].wyswietlInformacje();
+            }
+        }
+    }
+
+    public void wyswietlZamowieniaKlienta(int idKlienta) {
+        for (int i = 0; i < liczbaZamowien; i++) {
+            if (zamowienia[i].klient.getId() == idKlienta) {
+                zamowienia[i].wyswietlSzczegoly();
+            }
+        }
+    }
+}
+
+// Main.java
+public class Main {
+    public static void main(String[] args) {
+        SklepKomputerowy sklep = new SklepKomputerowy();
+
+        Produkt produkt1 = new Produkt(1, "Laptop Dell XPS 13", "Laptop", 4999.99, 10);
+        Produkt produkt2 = new Produkt(2, "Mysz Logitech MX Master 3", "Mysz", 349.99, 30);
+        Produkt produkt3 = new Produkt(3, "Monitor Samsung 27\"", "Monitor", 1299.99, 15);
+        Produkt produkt4 = new Produkt(4, "Klawiatura mechaniczna", "Klawiatura", 399.99, 20);
+
+        sklep.dodajProdukt(produkt1);
+        sklep.dodajProdukt(produkt2);
+        sklep.dodajProdukt(produkt3);
+        sklep.dodajProdukt(produkt4);
+
+        Klient klient1 = new Klient(1, "Jan", "Kowalski", "jan.kowalski@example.com", true);
+        Klient klient2 = new Klient(2, "Anna", "Nowak", "anna.nowak@example.com", false);
+        sklep.dodajKlienta(klient1);
+        sklep.dodajKlienta(klient2);
+
+        Produkt[] produktyZamowienia1 = {produkt1, produkt2};
+        int[] ilosciZamowienia1 = {1, 1};
+        Zamowienie zamowienie1 = sklep.utworzZamowienie(klient1, produktyZamowienia1, ilosciZamowienia1);
+        sklep.aktualizujStanMagazynowy(zamowienie1);
+
+        Produkt[] produktyZamowienia2 = {produkt3, produkt4};
+        int[] ilosciZamowienia2 = {2, 1};
+        Zamowienie zamowienie2 = sklep.utworzZamowienie(klient2, produktyZamowienia2, ilosciZamowienia2);
+        sklep.aktualizujStanMagazynowy(zamowienie2);
+
+        zamowienie1.wyswietlSzczegoly();
+        zamowienie2.wyswietlSzczegoly();
+
+        sklep.zmienStatusZamowienia(zamowienie1.getId(), "Zrealizowane");
+        System.out.println("\nPo zmianie statusu:");
+        zamowienie1.wyswietlSzczegoly();
+
+        System.out.println("\nProdukty - Laptopy:");
+        sklep.wyswietlProduktyWKategorii("Laptop");
+
+        System.out.println("\nZamówienia klienta Jan Kowalski:");
+        sklep.wyswietlZamowieniaKlienta(1);
+    }
+}
+
+// .gitignore
+*.class
+*.log
+*.jar
+out/
+bin/
+.DS_Store
+.idea/
+.vscode/
